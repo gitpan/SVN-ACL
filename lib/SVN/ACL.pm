@@ -3,26 +3,23 @@ package SVN::ACL;
 use strict;
 use YAML;
 
-our $VERSION = '0.01';
-$ENV{HOME} ||= (
-		$ENV{HOMEDRIVE} ? catdir(@ENV{qw( HOMEDRIVE HOMEPATH )}) : ''
-	) || (getpwuid($<))[7];
-my $aclfile = $ENV{HOME}. "/.svnacl/YAML.conf";
+our $VERSION = '0.02';
 
 sub new {
     my $class = shift;
-    my ($repos, $path)  = @_;
+    my $path = shift;
     my $perm;
-
-    if (-f $aclfile) {
-	($repos, $perm, $path) = YAML::LoadFile($aclfile);
+    
+    my $aclfile = "$path/YAML.conf";
+    (-w $path) or die "Can't access the config file: $aclfile";
+    if (-e $aclfile) {
+	$perm = YAML::LoadFile($aclfile);
     } 
     else {
 	$perm->{dir}->{'/'}->{'*'} = 'r';
 
     }
-    bless ( { repos => $repos,
-	      path => $path,
+    bless ( { path => $path,
 	      perm => $perm }, $class );
 }
 
@@ -120,7 +117,8 @@ CONF
 
 sub save {
     my $self = shift;
-    YAML::DumpFile($aclfile, $self->{repos}, $self->{perm}, $self->{path});
+    my $aclfile = $self->{path}."/YAML.conf";
+    YAML::DumpFile($aclfile, $self->{perm});
 }
 
 1;

@@ -4,7 +4,7 @@ use Test::More tests => 12;
 
 BEGIN { use_ok('SVN::ACL'); }
 ok($SVN::ACL::VERSION) if $SVN::ACL::VERSION or 1;
-ok(my $acl = SVN::ACL->new('repos', '/'));
+ok(my $acl = SVN::ACL->new('./'));
 ok($acl->newgroup('bar'));
 ok($acl->newuser('foo', 'foo'));
 ok($acl->togroup('hcchien', 'bar'));
